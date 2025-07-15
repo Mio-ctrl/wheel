@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glücksrad Konfiguration</title>
+    <link rel="stylesheet" href="style.css"> </head>
+<body>
+    <div class="container config-container">
+        <h1>Glücksrad Konfiguration</h1>
+
+        <div id="segmentsList">
+            </div>
+
+        <div class="config-buttons">
+            <button id="addSegmentButton">Segment hinzufügen</button>
+            <button id="saveSegmentsButton">Speichern</button>
+            <button onclick="window.location.href='/'">Zum Rad</button>
+        </div>
+        <p id="configStatusMessage" class="status-message"></p>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const segmentsList = document.getElementById('segmentsList');
+        const addSegmentButton = document.getElementById('addSegmentButton');
+        const saveSegmentsButton = document.getElementById('saveSegmentsButton');
+        const configStatusMessage = document.getElementById('configStatusMessage');
+
+        let currentSegments = [];
+
+        // Funktion zum Erstellen eines Eingabefeldes für ein Segment
+        function createSegmentInput(segment = { text: '', color: '#ffffff' }, index) {
+            const div = document.createElement('div');
+            div.classList.add('segment-input-group');
+            div.dataset.index = index;
+
+            div.innerHTML = `
+                <label for="segmentText${index}">Text:</label>
+                <input type="text" id="segmentText${index}" value="${segment.text}" placeholder="Segment Text">
+
+                <label for="segmentColor${index}">Farbe:</label>
+                <input type="color" id="segmentColor${index}" value="${segment.color}">
+
+                <button class="remove-segment-button" data-index="${index}">Entfernen</button>
+            `;
+
+            const removeButton = div.querySelector('.remove-segment-button');
+            removeButton.addEventListener('click', () => {
+                div.remove();
+                // Die Reihenfolge der Indizes muss nicht sofort aktualisiert werden, da wir die Daten beim Speichern neu einlesen
+            });
+
+            return div;
+        }
+
+        // Segmente laden, wenn der Client verbunden ist
+        socket.on('segmentsConfig', (config) => {
+            currentSegments = config;
+            segmentsList.innerHTML = ''; // Vorhandene Eingabefelder löschen
+            config.forEach((segment, index) => {
+                segmentsList.appendChild(createSegmentInput(segment, index));
+            });
+        });
+
+        // Event-Listener für "Segment hinzufügen"
+        addSegmentButton.addEventListener('click', () => {
+            const newIndex = segmentsList.children.length;
+            segmentsList.appendChild(createSegmentInput({ text: 'Neues Segment', color: '#ff00ff' }, newIndex));
+        });
+
+        // Event-Listener für "Speichern"
+        saveSegmentsButton.addEventListener('click', () => {
+            const newSegments = [];
+            document.querySelectorAll('.segment-input-group').forEach((group) => {
+                const textInput = group.querySelector('input[type="text"]');
+                const colorInput = group.querySelector('input[type="color"]');
+                newSegments.push({
+                    text: textInput.value,
+                    color: colorInput.value
+                });
+            });
+
+            if (newSegments.length === 0) {
+                configStatusMessage.textContent = 'Fehler: Es muss mindestens ein Segment vorhanden sein.';
+                configStatusMessage.style.color = 'red';
+                return;
+            }
+
+            socket.emit('saveSegments', newSegments);
+            configStatusMessage.textContent = 'Speichern...';
+            configStatusMessage.style.color = 'orange';
+        });
+
+        // Bestätigung vom Server, dass Segmente gespeichert wurden
+        socket.on('segmentsSaved', (message) => {
+            configStatusMessage.textContent = message;
+            configStatusMessage.style.color = 'green';
+            // Optional: Segmente neu laden, um sicherzustellen, dass die Anzeige aktuell ist
+            socket.emit('requestSegmentsConfig'); // Fordert die aktuelle Konfiguration an
+        });
+
+        socket.on('saveError', (message) => {
+            configStatusMessage.textContent = `Fehler beim Speichern: ${message}`;
+            configStatusMessage.style.color = 'red';
+        });
+
+        // Beim Laden der Seite die aktuellen Segmente anfordern
+        socket.emit('requestSegmentsConfig');
+
+    </script>
+</body>
+</html>
