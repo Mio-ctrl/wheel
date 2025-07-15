@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glücksrad</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Glücksrad</h1>
+        <div class="wheel-container">
+            <div class="wheel" id="wheel">
+                </div>
+            <div class="pointer"></div>
+        </div>
+        <button id="spinButton">Drehen</button>
+        <p id="statusMessage" class="status-message"></p>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
