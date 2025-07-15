@@ -1,87 +1,81 @@
-// public/script.js
-const socket = io();
-const wheel = document.getElementById('wheel');
-const spinButton = document.getElementById('spinButton');
-const statusMessage = document.getElementById('statusMessage');
+        // public/script.js Inhalt hier
+        const socket = io();
+        const wheel = document.getElementById('wheel');
+        const spinButton = document.getElementById('spinButton');
+        const statusMessage = document.getElementById('statusMessage');
 
-let segments = [];
-let spinning = false;
+        let segments = [];
+        let spinning = false;
 
-// Function to draw the wheel segments
-function drawWheel(segmentsConfig) {
-    segments = segmentsConfig;
-    wheel.innerHTML = ''; // Clear existing segments
-    const numSegments = segments.length;
-    const segmentAngle = 360 / numSegments;
+        // Funktion zum Zeichnen der Radsegmente
+        function drawWheel(segmentsConfig) {
+            segments = segmentsConfig;
+            wheel.innerHTML = ''; // Vorhandene Segmente löschen
+            const numSegments = segments.length;
+            const segmentAngle = 360 / numSegments; // Winkel jedes Segments
 
-    segments.forEach((segment, index) => {
-        const segmentElement = document.createElement('div');
-        segmentElement.classList.add('wheel-segment');
-        segmentElement.style.backgroundColor = segment.color;
-        segmentElement.style.transform = `rotate(${index * segmentAngle}deg) skewY(${90 - segmentAngle}deg)`;
+            segments.forEach((segment, index) => {
+                const segmentElement = document.createElement('div');
+                segmentElement.classList.add('wheel-segment');
+                segmentElement.style.backgroundColor = segment.color;
 
-        const segmentContent = document.createElement('div');
-        segmentContent.classList.add('segment-content');
-        segmentContent.style.transform = `rotate(${segmentAngle / 2}deg) skewY(${90 - segmentAngle}deg)`; // Adjust for text orientation
-        segmentContent.textContent = segment.text;
+                // Rotieren und Scheren, um einen Keil zu bilden
+                // Der Winkel `segmentAngle * index` dreht das Segment an die richtige Position
+                // `skewY(90 - segmentAngle)` macht den Keil.
+                segmentElement.style.transform = `rotate(${segmentAngle * index}deg) skewY(${90 - segmentAngle}deg)`;
 
-        // Positioning for text, needs to be adjusted based on number of segments and desired look
-        if (numSegments === 8) {
-             // For 8 segments, rotate text to be readable
-            segmentContent.style.transform = `rotate(${segmentAngle / 2 + 90}deg) skewY(${90 - segmentAngle}deg)`;
-            segmentContent.style.left = '50%';
-            segmentContent.style.top = '25%';
-            segmentContent.style.transformOrigin = '0% 0%';
-            segmentContent.style.width = '100%';
-            segmentContent.style.height = '100%';
-            segmentContent.style.display = 'flex';
-            segmentContent.style.alignItems = 'center';
-            segmentContent.style.justifyContent = 'center';
-            segmentContent.style.padding = '0';
+                const segmentContent = document.createElement('div');
+                segmentContent.classList.add('segment-content');
+                segmentContent.textContent = segment.text;
+
+                // Textausrichtung innerhalb des Keils
+                // Die Rotation des Textes muss den Keil-Effekt aufheben und den Text lesbar ausrichten.
+                // Der Mittelpunkt des Segments ist (segmentAngle / 2) innerhalb des Segments
+                // Plus die 90 Grad, um horizontal zu liegen, minus den Skew-Winkel, um ihn aufzuheben
+                const textRotation = segmentAngle / 2 + 90 + (90 - segmentAngle); // Angepasster Winkel für Text
+                segmentContent.style.transform = `rotate(${textRotation}deg)`;
+
+
+                segmentElement.appendChild(segmentContent);
+                wheel.appendChild(segmentElement);
+            });
         }
 
-
-        segmentElement.appendChild(segmentContent);
-        wheel.appendChild(segmentElement);
-    });
-}
-
-// Initial segments configuration from server
-socket.on('segmentsConfig', (config) => {
-    segments = config;
-    drawWheel(segments);
-});
+        // Anfängliche Segmentkonfiguration vom Server
+        socket.on('segmentsConfig', (config) => {
+            segments = config;
+            drawWheel(segments);
+        });
 
 
-spinButton.addEventListener('click', () => {
-    if (!spinning) {
-        socket.emit('spinWheel');
-        spinButton.disabled = true;
-        statusMessage.textContent = 'Warte auf Drehung...';
-    }
-});
+        spinButton.addEventListener('click', () => {
+            if (!spinning) {
+                socket.emit('spinWheel');
+                spinButton.disabled = true;
+                statusMessage.textContent = 'Warte auf Drehung...';
+            }
+        });
 
-socket.on('wheelSpun', (data) => {
-    const { targetRotation, winningSegment, randomIndex } = data;
-    console.log(`Received spin data: Target Rotation ${targetRotation}, Winning Segment: ${winningSegment.text}`);
+        socket.on('wheelSpun', (data) => {
+            const { targetRotation, winningSegment, randomIndex } = data;
+            console.log(`Spin-Daten empfangen: Zielrotation ${targetRotation}, Gewinnsegment: ${winningSegment.text}`);
 
-    spinning = true;
-    wheel.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)'; // Apply transition
-    wheel.style.transform = `rotate(${targetRotation}deg)`;
+            spinning = true;
+            wheel.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)'; // Transition anwenden
+            wheel.style.transform = `rotate(${targetRotation}deg)`;
 
-    // Listen for the end of the transition
-    wheel.addEventListener('transitionend', () => {
-        spinning = false;
-        spinButton.disabled = false;
-        statusMessage.textContent = `Gewinner: ${winningSegment.text}`;
+            // Auf das Ende der Transition warten
+            wheel.addEventListener('transitionend', () => {
+                spinning = false;
+                spinButton.disabled = false;
+                statusMessage.textContent = `Gewinner: ${winningSegment.text}`;
 
-        // Reset the transform to avoid accumulating large rotation values
-        // This makes sure the next spin starts from a clean slate relative to the current position
-        const currentRotation = targetRotation % 360;
-        wheel.style.transition = 'none'; // Temporarily remove transition
-        wheel.style.transform = `rotate(${currentRotation}deg)`; // Reset to actual visual position
+                // Transformation zurücksetzen, um große Rotationswerte zu vermeiden
+                const currentRotation = targetRotation % 360;
+                wheel.style.transition = 'none'; // Temporär Transition entfernen
+                wheel.style.transform = `rotate(${currentRotation}deg)`; // Auf die tatsächliche visuelle Position zurücksetzen
 
-        // Force a reflow to ensure the transition is reset before the next spin
-        void wheel.offsetWidth;
-    }, { once: true }); // Use { once: true } to ensure the event listener is removed after it fires
-});
+                // Einen Reflow erzwingen, um sicherzustellen, dass die Transition vor dem nächsten Spin zurückgesetzt wird
+                void wheel.offsetWidth;
+            }, { once: true }); // { once: true } verwenden, um sicherzustellen, dass der Event-Listener nach dem Auslösen entfernt wird
+        });
