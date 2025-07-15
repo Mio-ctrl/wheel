@@ -1,0 +1,143 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+    margin: 0;
+    color: #333;
+}
+
+.container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+}
+
+h1 {
+    color: #0056b3;
+    margin-bottom: 25px;
+}
+
+.wheel-container {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    margin: 30px auto;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.2);
+    border: 5px solid #ddd;
+}
+
+.wheel {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1); /* Slower ease-out */
+    /* background-color: #eee; /* Fallback */
+}
+
+.wheel-segment {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    top: 0;
+    left: 50%;
+    transform-origin: 0% 100%;
+    overflow: hidden;
+}
+
+.segment-content {
+    position: absolute;
+    left: -100%;
+    width: 200%;
+    height: 200%;
+    text-align: center;
+    padding-top: 10px;
+    font-weight: bold;
+    color: white;
+    font-size: 1.1em;
+    transform: rotate(90deg) skewY(55deg); /* Adjust for segment count */
+    transform-origin: 0 0;
+}
+
+/* Specific styling for 8 segments, adjust skewY based on segment count */
+.wheel-segment:nth-child(1) .segment-content { transform: rotate(90deg) skewY(55deg); }
+.wheel-segment:nth-child(2) .segment-content { transform: rotate(90deg) skewY(55deg); }
+.wheel-segment:nth-child(3) .segment-content { transform: rotate(90deg) skewY(55deg); }
+.wheel-segment:nth-child(4) .segment-content { transform: rotate(90deg) skewY(55deg); }
+.wheel-segment:nth-child(5) .segment-content { transform: rotate(90deg) skewY(55deg); }
+.wheel-segment:nth-child(6) .segment-content { transform: rotate(90deg) skewY(55deg); }
+.wheel-segment:nth-child(7) .segment-content { transform: rotate(90deg) skewY(55deg); }
+.wheel-segment:nth-child(8) .segment-content { transform: rotate(90deg) skewY(55deg); }
+
+
+.pointer {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 30px solid #dc3545;
+    z-index: 10;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.status-message {
+    margin-top: 20px;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #28a745;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+        margin: 15px;
+    }
+
+    .wheel-container {
+        width: 250px;
+        height: 250px;
+    }
+
+    button {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+
+    .status-message {
+        font-size: 1em;
+    }
+}
