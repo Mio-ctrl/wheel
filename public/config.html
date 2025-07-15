@@ -31,25 +31,25 @@
         let currentSegments = [];
 
         // Funktion zum Erstellen eines Eingabefeldes für ein Segment
-        function createSegmentInput(segment = { text: '', color: '#ffffff' }, index) {
+        function createSegmentInput(segment = { text: '', color: '#ffffff' }) {
             const div = document.createElement('div');
             div.classList.add('segment-input-group');
-            div.dataset.index = index;
 
+            // Verwende ein Template-Literal für den innerHTML
             div.innerHTML = `
-                <label for="segmentText${index}">Text:</label>
-                <input type="text" id="segmentText${index}" value="${segment.text}" placeholder="Segment Text">
+                <label>Text:</label>
+                <input type="text" value="${segment.text}" placeholder="Segment Text">
 
-                <label for="segmentColor${index}">Farbe:</label>
-                <input type="color" id="segmentColor${index}" value="${segment.color}">
+                <label>Farbe:</label>
+                <input type="color" value="${segment.color}">
 
-                <button class="remove-segment-button" data-index="${index}">Entfernen</button>
+                <button class="remove-segment-button">Entfernen</button>
             `;
 
             const removeButton = div.querySelector('.remove-segment-button');
             removeButton.addEventListener('click', () => {
                 div.remove();
-                // Die Reihenfolge der Indizes muss nicht sofort aktualisiert werden, da wir die Daten beim Speichern neu einlesen
+                // Hier brauchen wir keinen Index mehr, da wir beim Speichern alle Werte neu auslesen.
             });
 
             return div;
@@ -59,15 +59,14 @@
         socket.on('segmentsConfig', (config) => {
             currentSegments = config;
             segmentsList.innerHTML = ''; // Vorhandene Eingabefelder löschen
-            config.forEach((segment, index) => {
-                segmentsList.appendChild(createSegmentInput(segment, index));
+            config.forEach((segment) => { // Index ist hier nicht mehr nötig beim Erstellen der Inputs
+                segmentsList.appendChild(createSegmentInput(segment));
             });
         });
 
         // Event-Listener für "Segment hinzufügen"
         addSegmentButton.addEventListener('click', () => {
-            const newIndex = segmentsList.children.length;
-            segmentsList.appendChild(createSegmentInput({ text: 'Neues Segment', color: '#ff00ff' }, newIndex));
+            segmentsList.appendChild(createSegmentInput({ text: 'Neues Segment', color: '#888888' })); // Standardfarbe anpassen
         });
 
         // Event-Listener für "Speichern"
@@ -76,11 +75,25 @@
             document.querySelectorAll('.segment-input-group').forEach((group) => {
                 const textInput = group.querySelector('input[type="text"]');
                 const colorInput = group.querySelector('input[type="color"]');
-                newSegments.push({
-                    text: textInput.value,
-                    color: colorInput.value
-                });
+                // Trimme Text und überprüfe auf leere Werte
+                const text = textInput.value.trim();
+                const color = colorInput.value;
+
+                if (text === "") {
+                    configStatusMessage.textContent = 'Fehler: Segment-Text darf nicht leer sein.';
+                    configStatusMessage.style.color = 'red';
+                    return; // Beende die Funktion, wenn ein Fehler gefunden wird
+                }
+
+                newSegments.push({ text: text, color: color });
             });
+
+            // Wenn die Schleife aufgrund eines Fehlers abgebrochen wurde, ist newSegments evtl. unvollständig
+            // Prüfe hier noch einmal auf die Anzahl der Segmente.
+            if (newSegments.length !== document.querySelectorAll('.segment-input-group').length) {
+                // Ein Fehler wurde bereits oben gemeldet.
+                return;
+            }
 
             if (newSegments.length === 0) {
                 configStatusMessage.textContent = 'Fehler: Es muss mindestens ein Segment vorhanden sein.';
@@ -98,7 +111,8 @@
             configStatusMessage.textContent = message;
             configStatusMessage.style.color = 'green';
             // Optional: Segmente neu laden, um sicherzustellen, dass die Anzeige aktuell ist
-            socket.emit('requestSegmentsConfig'); // Fordert die aktuelle Konfiguration an
+            // Dies ist wichtig, falls der Server die Segmente noch einmal validiert/anpasst
+            socket.emit('requestSegmentsConfig');
         });
 
         socket.on('saveError', (message) => {
