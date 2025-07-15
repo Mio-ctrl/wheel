@@ -1,198 +1,245 @@
-/* public/style.css Inhalt hier */
-body {
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #f0f2f5;
-    margin: 0;
-    color: #333;
-}
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
+            color: #333;
+        }
 
-.container {
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    width: 100%;
-    max-width: 500px; /* Für die Hauptseite */
-}
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 500px; /* Für die Hauptseite */
+        }
 
-h1 {
-    color: #0056b3;
-    margin-bottom: 25px;
-}
+        h1 {
+            color: #0056b3;
+            margin-bottom: 25px;
+        }
 
-.wheel-container {
-    position: relative;
-    width: 300px;
-    height: 300px;
-    margin: 30px auto;
-    border-radius: 50%;
-    overflow: hidden;
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.2);
-    border: 5px solid #ddd;
-}
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 30px auto;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.2);
+            border: 8px solid #34495e; /* Dickere, dunkle Umrandung */
+            box-sizing: content-box; /* Stellt sicher, dass Border die Größe nicht beeinflusst */
+        }
 
-.wheel {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1); /* Slower ease-out */
-}
+        .wheel {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+            background-color: #ecf0f1; /* Hintergrundfarbe für den Fall, dass keine Segmente da sind */
+        }
 
-.wheel-segment {
-    position: absolute;
-    width: 50%; /* Halber Radius */
-    height: 50%; /* Halber Radius */
-    top: 0;
-    left: 50%; /* Positioniert den Mittelpunkt des Kreissektors in der Mitte des Rades */
-    transform-origin: 0% 100%; /* Drehpunkt: untere linke Ecke des 50x50 Quadrats, welche der Mittelpunkt des Rades ist */
-    overflow: hidden;
-    /* Hintergrundfarbe wird von JS gesetzt */
-}
+        .wheel-segment {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            top: 0;
+            left: 50%;
+            transform-origin: 0% 100%; /* Drehpunkt ist die Mitte des Rades */
+            overflow: hidden;
+            border-right: 1px solid rgba(0, 0, 0, 0.2); /* Segment-Trennung */
+        }
 
-.segment-content {
-    position: absolute;
-    width: 100%; /* Nimmt 100% der Elternbreite ein */
-    height: 100%; /* Nimmt 100% der Elternhöhe ein */
-    display: flex; /* Für Flexbox-Zentrierung */
-    align-items: flex-start; /* Text am oberen Rand des Segments */
-    justify-content: center; /* Text horizontal zentrieren */
-    padding-top: 15px; /* Abstand vom äußeren Rand des Rades */
-    font-weight: bold;
-    color: white;
-    font-size: 1.1em;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Für bessere Lesbarkeit */
-    /* Dies wird nun dynamisch per JS gesetzt, aber hier für den Fallback/Verständnis */
-    /* transform: rotate(Winkel) translate(X, Y); */
-    transform-origin: 50% 50%; /* Text dreht sich um seine eigene Mitte */
-}
+        .wheel-segment:last-child {
+             border-right: none; /* Letztes Segment keine rechte Border */
+        }
 
-.pointer {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 15px solid transparent;
-    border-right: 15px solid transparent;
-    border-top: 30px solid #dc3545;
-    z-index: 10;
-}
+        .segment-content {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: flex-start; /* Text am oberen Rand des Segments */
+            justify-content: center;
+            padding-top: 25px; /* Abstand vom äußeren Rand des Rades - ANPASSEN! */
+            font-weight: bold;
+            color: white;
+            font-size: 1.1em;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.6); /* Für bessere Lesbarkeit */
+            user-select: none; /* Text nicht auswählbar machen */
+            box-sizing: border-box; /* Padding ist Teil der Box-Größe */
+        }
 
-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 8px;
-    font-size: 1.2em;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 20px;
-}
+        .pointer {
+            position: absolute;
+            top: -10px; /* Leicht über dem Rad positioniert */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent; /* Breiterer Pfeil */
+            border-right: 20px solid transparent;
+            border-top: 40px solid #e74c3c; /* Kräftigere Farbe */
+            z-index: 10;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3)); /* Schatten für 3D-Effekt */
+        }
 
-button:hover {
-    background-color: #0056b3;
-}
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
 
-button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-}
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
 
-.status-message {
-    margin-top: 20px;
-    font-size: 1.1em;
-    font-weight: bold;
-    color: #28a745;
-}
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
 
-/* Konfigurationsseite spezifisches CSS */
-.config-container {
-    max-width: 600px;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    margin: 20px auto;
-}
+        .status-message {
+            margin-top: 20px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #28a745;
+        }
 
-.segment-input-group {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-}
+        /* Konfigurationsseite spezifisches CSS (unverändert) */
+        .config-container {
+            max-width: 600px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 20px auto;
+        }
 
-.segment-input-group label {
-    flex: 0 0 80px; /* Feste Breite für das Label */
-    text-align: right;
-    margin-right: 10px;
-}
+        .segment-input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 10px; /* Abstand zwischen den Elementen */
+        }
 
-.segment-input-group input[type="text"],
-.segment-input-group input[type="color"] {
-    flex: 1; /* Nimmt den restlichen Platz ein */
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1em;
-}
+        .segment-input-group label {
+            flex: 0 0 80px; /* Feste Breite für das Label */
+            text-align: right;
+            min-width: 60px; /* Mindestbreite für kleine Bildschirme */
+        }
 
-.segment-input-group input[type="color"] {
-    width: 50px; /* Kleinere Breite für Farbauswahl */
-    height: 36px; /* Höhe anpassen */
-    padding: 0;
-    border: none;
-    cursor: pointer;
-}
+        .segment-input-group input[type="text"] {
+            flex: 1; /* Nimmt den restlichen Platz ein */
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+        }
 
-.config-buttons {
-    margin-top: 20px;
-    display: flex;
-    justify-content: space-between;
-}
+        .segment-input-group input[type="color"] {
+            width: 40px; /* Kleinere Breite für Farbauswahl */
+            height: 36px; /* Höhe anpassen */
+            padding: 0;
+            border: none;
+            cursor: pointer;
+            border: 1px solid #ddd; /* Sichtbare Umrandung für Farbfeld */
+            border-radius: 4px;
+        }
 
-.config-buttons button {
-    margin: 0 5px;
-}
+        .segment-input-group .remove-segment-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+            box-shadow: none; /* Kein extra Schatten hier */
+            margin-top: 0; /* Kein extra Margin hier */
+        }
 
-/* Responsive Design */
-@media (max-width: 600px) {
-    .container, .config-container {
-        padding: 20px;
-        margin: 15px;
-    }
+        .segment-input-group .remove-segment-button:hover {
+            background-color: #c82333;
+            transform: none; /* Kein translateY für diese Buttons */
+        }
 
-    .wheel-container {
-        width: 250px;
-        height: 250px;
-    }
 
-    button {
-        padding: 10px 20px;
-        font-size: 1em;
-    }
+        .config-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap; /* Buttons umbrechen auf kleinen Bildschirmen */
+            gap: 10px; /* Abstand zwischen Buttons */
+        }
 
-    .status-message {
-        font-size: 1em;
-    }
+        .config-buttons button {
+            flex-grow: 1; /* Buttons füllen den verfügbaren Platz aus */
+            margin: 0; /* Margin über Gap gesteuert */
+        }
 
-    .segment-input-group {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .segment-input-group label {
-        width: 100%;
-        text-align: left;
-        margin-bottom: 5px;
-    }
-    .segment-input-group input {
-        width: calc(100% - 16px); /* Anpassung für Padding */
-    }
-}
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .container, .config-container {
+                padding: 15px;
+                margin: 10px;
+            }
+
+            .wheel-container {
+                width: 250px;
+                height: 250px;
+            }
+
+            .pointer {
+                border-left: 15px solid transparent;
+                border-right: 15px solid transparent;
+                border-top: 30px solid #e74c3c;
+            }
+
+            button {
+                padding: 10px 15px;
+                font-size: 1em;
+            }
+
+            .status-message {
+                font-size: 0.95em;
+            }
+
+            .segment-input-group {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            .segment-input-group label {
+                width: 100%;
+                text-align: left;
+                margin-right: 0;
+            }
+            .segment-input-group input {
+                width: calc(100% - 16px);
+            }
+            .segment-input-group input[type="color"] {
+                width: calc(100% - 16px); /* Anpassung für mobile */
+            }
+            .segment-input-group .remove-segment-button {
+                width: 100%;
+                margin-top: 5px;
+            }
+        }
