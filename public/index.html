@@ -3,116 +3,423 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glücksrad</title>
-    <link rel="stylesheet" href="style.css"> </head>
+    <title>Professionelles Glücksrad</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .title {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto 30px;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            transition: transform 3s cubic-bezier(0.23, 1, 0.32, 1);
+            border: 8px solid #fff;
+            box-shadow: 0 0 20px rgba(255,255,255,0.5);
+        }
+
+        .wheel-segment {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: 100% 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+            overflow: hidden;
+        }
+
+        .wheel-segment:nth-child(1) { 
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            transform: rotate(0deg);
+        }
+        .wheel-segment:nth-child(2) { 
+            background: linear-gradient(45deg, #4ecdc4, #7dd3cc);
+            transform: rotate(45deg);
+        }
+        .wheel-segment:nth-child(3) { 
+            background: linear-gradient(45deg, #45b7d1, #6bcbed);
+            transform: rotate(90deg);
+        }
+        .wheel-segment:nth-child(4) { 
+            background: linear-gradient(45deg, #f9ca24, #f0932b);
+            transform: rotate(135deg);
+        }
+        .wheel-segment:nth-child(5) { 
+            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+            transform: rotate(180deg);
+        }
+        .wheel-segment:nth-child(6) { 
+            background: linear-gradient(45deg, #26de81, #20bf6b);
+            transform: rotate(225deg);
+        }
+        .wheel-segment:nth-child(7) { 
+            background: linear-gradient(45deg, #fd79a8, #e84393);
+            transform: rotate(270deg);
+        }
+        .wheel-segment:nth-child(8) { 
+            background: linear-gradient(45deg, #fdcb6e, #e17055);
+            transform: rotate(315deg);
+        }
+
+        .wheel-segment-text {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotate(-22.5deg);
+            margin-left: 20px;
+        }
+
+        .pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid #fff;
+            z-index: 10;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+
+        .center-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            border: 4px solid #fff;
+            z-index: 5;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .spin-button {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255,107,107,0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .spin-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,107,107,0.6);
+        }
+
+        .spin-button:active {
+            transform: translateY(0);
+        }
+
+        .spin-button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .result.show {
+            opacity: 1;
+        }
+
+        .result-text {
+            background: rgba(255,255,255,0.1);
+            padding: 15px 25px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .segment-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .segment-input input {
+            padding: 8px 12px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 14px;
+            width: 120px;
+        }
+
+        .segment-input input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .segment-input input:focus {
+            outline: none;
+            border-color: #fff;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .update-button {
+            background: linear-gradient(45deg, #4ecdc4, #7dd3cc);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(78,205,196,0.4);
+        }
+
+        .update-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(78,205,196,0.6);
+        }
+
+        @media (max-width: 768px) {
+            .wheel-container {
+                width: 300px;
+                height: 300px;
+            }
+            
+            .title {
+                font-size: 2em;
+            }
+            
+            .wheel-segment {
+                font-size: 12px;
+            }
+            
+            .segment-input {
+                flex-direction: column;
+            }
+            
+            .segment-input input {
+                width: 150px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Glücksrad</h1>
+        <h1 class="title">🎰 Glücksrad</h1>
+        
         <div class="wheel-container">
-            <div class="wheel" id="wheel">
-                </div>
             <div class="pointer"></div>
+            <div class="wheel" id="wheel">
+                <div class="wheel-segment">
+                    <div class="wheel-segment-text">Option 1</div>
+                </div>
+                <div class="wheel-segment">
+                    <div class="wheel-segment-text">Option 2</div>
+                </div>
+                <div class="wheel-segment">
+                    <div class="wheel-segment-text">Option 3</div>
+                </div>
+                <div class="wheel-segment">
+                    <div class="wheel-segment-text">Option 4</div>
+                </div>
+                <div class="wheel-segment">
+                    <div class="wheel-segment-text">Option 5</div>
+                </div>
+                <div class="wheel-segment">
+                    <div class="wheel-segment-text">Option 6</div>
+                </div>
+                <div class="wheel-segment">
+                    <div class="wheel-segment-text">Option 7</div>
+                </div>
+                <div class="wheel-segment">
+                    <div class="wheel-segment-text">Option 8</div>
+                </div>
+            </div>
+            <div class="center-circle"></div>
         </div>
-        <button id="spinButton">Drehen</button>
-        <p id="statusMessage" class="status-message"></p>
+        
+        <button class="spin-button" id="spinButton" onclick="spinWheel()">
+            Rad drehen!
+        </button>
+        
+        <div class="result" id="result">
+            <div class="result-text" id="resultText"></div>
+        </div>
+        
+        <div class="controls">
+            <div class="segment-input">
+                <input type="text" id="option1" placeholder="Option 1" value="Gewinn 1">
+                <input type="text" id="option2" placeholder="Option 2" value="Gewinn 2">
+                <input type="text" id="option3" placeholder="Option 3" value="Gewinn 3">
+                <input type="text" id="option4" placeholder="Option 4" value="Gewinn 4">
+            </div>
+            <div class="segment-input">
+                <input type="text" id="option5" placeholder="Option 5" value="Gewinn 5">
+                <input type="text" id="option6" placeholder="Option 6" value="Gewinn 6">
+                <input type="text" id="option7" placeholder="Option 7" value="Gewinn 7">
+                <input type="text" id="option8" placeholder="Option 8" value="Gewinn 8">
+            </div>
+            <button class="update-button" onclick="updateOptions()">Optionen aktualisieren</button>
+        </div>
     </div>
 
-    <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
-        const wheel = document.getElementById('wheel');
-        const spinButton = document.getElementById('spinButton');
-        const statusMessage = document.getElementById('statusMessage');
-
-        let segments = [];
-        let spinning = false;
-
-        // Funktion zum Zeichnen der Radsegmente
-        function drawWheel(segmentsConfig) {
-            segments = segmentsConfig;
-            wheel.innerHTML = ''; // Vorhandene Segmente löschen
-
-            if (segments.length === 0) {
-                statusMessage.textContent = 'Bitte fügen Sie Segmente auf der Konfigurationsseite hinzu.';
-                spinButton.disabled = true;
-                return;
+        let isSpinning = false;
+        let currentRotation = 0;
+        let segments = ['Gewinn 1', 'Gewinn 2', 'Gewinn 3', 'Gewinn 4', 'Gewinn 5', 'Gewinn 6', 'Gewinn 7', 'Gewinn 8'];
+        
+        function updateOptions() {
+            const newSegments = [];
+            for (let i = 1; i <= 8; i++) {
+                const value = document.getElementById(`option${i}`).value.trim();
+                newSegments.push(value || `Option ${i}`);
             }
-
-            spinButton.disabled = false; // Button aktivieren, wenn Segmente vorhanden sind
-
-            const numSegments = segments.length;
-            const segmentAngle = 360 / numSegments; // Winkel jedes Segments
-
-            segments.forEach((segment, index) => {
-                const segmentElement = document.createElement('div');
-                segmentElement.classList.add('wheel-segment');
-                segmentElement.style.backgroundColor = segment.color;
-                
-                // Positionierung und Formung des Segments
-                segmentElement.style.transform = `rotate(${segmentAngle * index}deg)`;
-                
-                // Erstellen des Segmentinhalts
-                const segmentContent = document.createElement('div');
-                segmentContent.classList.add('segment-content');
-                segmentContent.textContent = segment.text;
-                
-                // Textpositionierung und -ausrichtung
-                segmentContent.style.transform = `rotate(${segmentAngle/2}deg)`;
-                segmentContent.style.transformOrigin = 'left center';
-                segmentContent.style.left = '50%';
-                
-                // Dynamische Anpassungen basierend auf Segmentanzahl
-                const baseFontSize = Math.min(1.1, 1.5 - (numSegments * 0.03));
-                const basePadding = Math.max(10, 35 - (numSegments * 1.5));
-                
-                segmentContent.style.fontSize = `${baseFontSize}em`;
-                segmentContent.style.paddingTop = `${basePadding}px`;
-
-
-                segmentElement.appendChild(segmentContent);
-                wheel.appendChild(segmentElement);
+            
+            segments = newSegments;
+            
+            // Update the wheel segments
+            const segmentElements = document.querySelectorAll('.wheel-segment-text');
+            segmentElements.forEach((element, index) => {
+                element.textContent = segments[index];
             });
         }
-
-        // Anfängliche Segmentkonfiguration vom Server
-        socket.on('segmentsConfig', (config) => {
-            segments = config;
-            drawWheel(segments);
-        });
-
-
-        spinButton.addEventListener('click', () => {
-            if (!spinning && segments.length > 0) {
-                socket.emit('spinWheel');
-                spinButton.disabled = true;
-                statusMessage.textContent = 'Warte auf Drehung...';
+        
+        function spinWheel() {
+            if (isSpinning) return;
+            
+            isSpinning = true;
+            const spinButton = document.getElementById('spinButton');
+            const result = document.getElementById('result');
+            const resultText = document.getElementById('resultText');
+            const wheel = document.getElementById('wheel');
+            
+            // Disable button and hide result
+            spinButton.disabled = true;
+            spinButton.textContent = 'Dreht...';
+            result.classList.remove('show');
+            
+            // Calculate random spin
+            const minSpins = 3;
+            const maxSpins = 6;
+            const randomSpins = Math.random() * (maxSpins - minSpins) + minSpins;
+            const randomAngle = Math.random() * 360;
+            
+            // Each segment is 45 degrees (360/8)
+            const segmentAngle = 360 / 8;
+            const totalRotation = randomSpins * 360 + randomAngle;
+            const finalRotation = currentRotation + totalRotation;
+            
+            // Apply rotation
+            wheel.style.transform = `rotate(${finalRotation}deg)`;
+            currentRotation = finalRotation % 360;
+            
+            // Calculate winning segment
+            // The pointer is at the top, so we need to account for that
+            const normalizedAngle = (360 - (currentRotation % 360)) % 360;
+            const winningSegmentIndex = Math.floor(normalizedAngle / segmentAngle);
+            const winningSegment = segments[winningSegmentIndex];
+            
+            // Show result after animation
+            setTimeout(() => {
+                resultText.textContent = `🎉 ${winningSegment} 🎉`;
+                result.classList.add('show');
+                
+                // Re-enable button
+                spinButton.disabled = false;
+                spinButton.textContent = 'Nochmal drehen!';
+                isSpinning = false;
+            }, 3000);
+        }
+        
+        // Initialize with default options
+        updateOptions();
+        
+        // Add keyboard support
+        document.addEventListener('keydown', function(event) {
+            if (event.code === 'Space' && !isSpinning) {
+                event.preventDefault();
+                spinWheel();
             }
         });
-
-        socket.on('wheelSpun', (data) => {
-            const { targetRotation, winningSegment } = data; // randomIndex wird hier nicht mehr benötigt
-            console.log(`Spin-Daten empfangen: Zielrotation ${targetRotation}, Gewinnsegment: ${winningSegment.text}`);
-
-            spinning = true;
-            wheel.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)'; // Transition anwenden
-            wheel.style.transform = `rotate(${targetRotation}deg)`;
-
-            // Auf das Ende der Transition warten
-            wheel.addEventListener('transitionend', () => {
-                spinning = false;
-                spinButton.disabled = false;
-                statusMessage.textContent = `Gewinner: ${winningSegment.text}`;
-
-                // Transformation zurücksetzen, um große Rotationswerte zu vermeiden
-                // Die tatsächliche visuelle Position wird beibehalten
-                const currentRotation = targetRotation % 360;
-                wheel.style.transition = 'none'; // Temporär Transition entfernen
-                wheel.style.transform = `rotate(${currentRotation}deg)`; // Auf die tatsächliche visuelle Position zurücksetzen
-
-                // Einen Reflow erzwingen, um sicherzustellen, dass die Transition vor dem nächsten Spin zurückgesetzt wird
-                void wheel.offsetWidth;
-            }, { once: true }); // { once: true } verwenden, um sicherzustellen, dass der Event-Listener nach dem Auslösen entfernt wird
+        
+        // Add enter key support for inputs
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    updateOptions();
+                }
+            });
         });
     </script>
 </body>
