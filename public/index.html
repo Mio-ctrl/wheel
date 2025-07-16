@@ -3,113 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professionelles Glücksrad</title>
+    <title>Spin the Wheel</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
 
         .container {
             text-align: center;
-            max-width: 600px;
-            width: 100%;
-            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
-        .title {
-            font-size: 2.5em;
+        h1 {
             margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .wheel-container {
             position: relative;
-            width: 400px;
-            height: 400px;
-            margin: 0 auto 30px;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+            margin: 20px auto;
         }
 
-        .wheel {
-            width: 100%;
-            height: 100%;
+        #wheelCanvas {
+            border: 4px solid white;
             border-radius: 50%;
-            position: relative;
-            overflow: hidden;
-            transition: transform 3s cubic-bezier(0.23, 1, 0.32, 1);
-            border: 8px solid #fff;
-            box-shadow: 0 0 20px rgba(255,255,255,0.5);
-        }
-
-        .wheel-segment {
-            position: absolute;
-            width: 50%;
-            height: 50%;
-            transform-origin: 100% 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
-            overflow: hidden;
-        }
-
-        .wheel-segment:nth-child(1) { 
-            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
-            transform: rotate(0deg);
-        }
-        .wheel-segment:nth-child(2) { 
-            background: linear-gradient(45deg, #4ecdc4, #7dd3cc);
-            transform: rotate(45deg);
-        }
-        .wheel-segment:nth-child(3) { 
-            background: linear-gradient(45deg, #45b7d1, #6bcbed);
-            transform: rotate(90deg);
-        }
-        .wheel-segment:nth-child(4) { 
-            background: linear-gradient(45deg, #f9ca24, #f0932b);
-            transform: rotate(135deg);
-        }
-        .wheel-segment:nth-child(5) { 
-            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
-            transform: rotate(180deg);
-        }
-        .wheel-segment:nth-child(6) { 
-            background: linear-gradient(45deg, #26de81, #20bf6b);
-            transform: rotate(225deg);
-        }
-        .wheel-segment:nth-child(7) { 
-            background: linear-gradient(45deg, #fd79a8, #e84393);
-            transform: rotate(270deg);
-        }
-        .wheel-segment:nth-child(8) { 
-            background: linear-gradient(45deg, #fdcb6e, #e17055);
-            transform: rotate(315deg);
-        }
-
-        .wheel-segment-text {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transform: rotate(-22.5deg);
-            margin-left: 20px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            display: block;
+            margin: 0 auto;
         }
 
         .pointer {
@@ -121,50 +54,35 @@
             height: 0;
             border-left: 15px solid transparent;
             border-right: 15px solid transparent;
-            border-top: 30px solid #fff;
+            border-top: 30px solid white;
             z-index: 10;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
         }
 
-        .center-circle {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            border-radius: 50%;
-            border: 4px solid #fff;
-            z-index: 5;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        .controls {
+            margin-top: 30px;
         }
 
-        .spin-button {
+        button {
             background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
             border: none;
             color: white;
-            padding: 15px 40px;
+            padding: 15px 30px;
             font-size: 18px;
             font-weight: bold;
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255,107,107,0.4);
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            margin: 10px;
         }
 
-        .spin-button:hover {
+        button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255,107,107,0.6);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
         }
 
-        .spin-button:active {
-            transform: translateY(0);
-        }
-
-        .spin-button:disabled {
+        button:disabled {
             background: #95a5a6;
             cursor: not-allowed;
             transform: none;
@@ -175,7 +93,10 @@
             margin-top: 30px;
             font-size: 24px;
             font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             min-height: 60px;
             display: flex;
             align-items: center;
@@ -188,238 +109,240 @@
             opacity: 1;
         }
 
-        .result-text {
-            background: rgba(255,255,255,0.1);
-            padding: 15px 25px;
-            border-radius: 25px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .controls {
-            margin-top: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .segment-input {
-            display: flex;
+        .options {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-            justify-content: center;
         }
 
-        .segment-input input {
-            padding: 8px 12px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 20px;
-            background: rgba(255,255,255,0.1);
+        .options input {
+            padding: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
             color: white;
             font-size: 14px;
-            width: 120px;
         }
 
-        .segment-input input::placeholder {
-            color: rgba(255,255,255,0.7);
+        .options input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
         }
 
-        .segment-input input:focus {
+        .options input:focus {
             outline: none;
-            border-color: #fff;
-            background: rgba(255,255,255,0.2);
-        }
-
-        .update-button {
-            background: linear-gradient(45deg, #4ecdc4, #7dd3cc);
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            font-size: 14px;
-            font-weight: bold;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(78,205,196,0.4);
-        }
-
-        .update-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(78,205,196,0.6);
+            border-color: white;
+            background: rgba(255, 255, 255, 0.2);
         }
 
         @media (max-width: 768px) {
-            .wheel-container {
-                width: 300px;
-                height: 300px;
+            .container {
+                padding: 20px;
+                margin: 20px;
             }
             
-            .title {
+            h1 {
                 font-size: 2em;
             }
             
-            .wheel-segment {
-                font-size: 12px;
-            }
-            
-            .segment-input {
-                flex-direction: column;
-            }
-            
-            .segment-input input {
-                width: 150px;
+            #wheelCanvas {
+                width: 300px !important;
+                height: 300px !important;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="title">🎰 Glücksrad</h1>
+        <h1>🎰 Spin the Wheel</h1>
         
         <div class="wheel-container">
             <div class="pointer"></div>
-            <div class="wheel" id="wheel">
-                <div class="wheel-segment">
-                    <div class="wheel-segment-text">Option 1</div>
-                </div>
-                <div class="wheel-segment">
-                    <div class="wheel-segment-text">Option 2</div>
-                </div>
-                <div class="wheel-segment">
-                    <div class="wheel-segment-text">Option 3</div>
-                </div>
-                <div class="wheel-segment">
-                    <div class="wheel-segment-text">Option 4</div>
-                </div>
-                <div class="wheel-segment">
-                    <div class="wheel-segment-text">Option 5</div>
-                </div>
-                <div class="wheel-segment">
-                    <div class="wheel-segment-text">Option 6</div>
-                </div>
-                <div class="wheel-segment">
-                    <div class="wheel-segment-text">Option 7</div>
-                </div>
-                <div class="wheel-segment">
-                    <div class="wheel-segment-text">Option 8</div>
-                </div>
-            </div>
-            <div class="center-circle"></div>
-        </div>
-        
-        <button class="spin-button" id="spinButton" onclick="spinWheel()">
-            Rad drehen!
-        </button>
-        
-        <div class="result" id="result">
-            <div class="result-text" id="resultText"></div>
+            <canvas id="wheelCanvas" width="400" height="400"></canvas>
         </div>
         
         <div class="controls">
-            <div class="segment-input">
-                <input type="text" id="option1" placeholder="Option 1" value="Gewinn 1">
-                <input type="text" id="option2" placeholder="Option 2" value="Gewinn 2">
-                <input type="text" id="option3" placeholder="Option 3" value="Gewinn 3">
-                <input type="text" id="option4" placeholder="Option 4" value="Gewinn 4">
-            </div>
-            <div class="segment-input">
-                <input type="text" id="option5" placeholder="Option 5" value="Gewinn 5">
-                <input type="text" id="option6" placeholder="Option 6" value="Gewinn 6">
-                <input type="text" id="option7" placeholder="Option 7" value="Gewinn 7">
-                <input type="text" id="option8" placeholder="Option 8" value="Gewinn 8">
-            </div>
-            <button class="update-button" onclick="updateOptions()">Optionen aktualisieren</button>
+            <button id="spinBtn" onclick="spin()">Spin the Wheel!</button>
+            <button onclick="resetWheel()">Reset</button>
+        </div>
+        
+        <div class="result" id="result"></div>
+        
+        <div class="options">
+            <input type="text" id="option0" placeholder="Option 1" value="Prize 1">
+            <input type="text" id="option1" placeholder="Option 2" value="Prize 2">
+            <input type="text" id="option2" placeholder="Option 3" value="Prize 3">
+            <input type="text" id="option3" placeholder="Option 4" value="Prize 4">
+            <input type="text" id="option4" placeholder="Option 5" value="Prize 5">
+            <input type="text" id="option5" placeholder="Option 6" value="Prize 6">
+            <input type="text" id="option6" placeholder="Option 7" value="Prize 7">
+            <input type="text" id="option7" placeholder="Option 8" value="Prize 8">
         </div>
     </div>
 
     <script>
-        let isSpinning = false;
-        let currentRotation = 0;
-        let segments = ['Gewinn 1', 'Gewinn 2', 'Gewinn 3', 'Gewinn 4', 'Gewinn 5', 'Gewinn 6', 'Gewinn 7', 'Gewinn 8'];
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        const spinBtn = document.getElementById('spinBtn');
+        const result = document.getElementById('result');
         
-        function updateOptions() {
-            const newSegments = [];
-            for (let i = 1; i <= 8; i++) {
-                const value = document.getElementById(`option${i}`).value.trim();
-                newSegments.push(value || `Option ${i}`);
+        let segments = ['Prize 1', 'Prize 2', 'Prize 3', 'Prize 4', 'Prize 5', 'Prize 6', 'Prize 7', 'Prize 8'];
+        let colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7', '#26de81', '#fd79a8', '#fdcb6e'];
+        
+        let currentAngle = 0;
+        let spinAngleStart = 0;
+        let spinTime = 0;
+        let spinTimeTotal = 0;
+        let isSpinning = false;
+        
+        function drawWheel() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 180;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const angleStep = (2 * Math.PI) / segments.length;
+            
+            for (let i = 0; i < segments.length; i++) {
+                const angle = i * angleStep;
+                
+                // Draw segment
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, angle, angle + angleStep);
+                ctx.closePath();
+                
+                // Fill with color
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.fill();
+                
+                // Draw border
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // Draw text
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(angle + angleStep / 2);
+                ctx.textAlign = 'center';
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 14px Arial';
+                ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                ctx.shadowBlur = 2;
+                ctx.fillText(segments[i], radius * 0.7, 5);
+                ctx.restore();
             }
             
-            segments = newSegments;
-            
-            // Update the wheel segments
-            const segmentElements = document.querySelectorAll('.wheel-segment-text');
-            segmentElements.forEach((element, index) => {
-                element.textContent = segments[index];
-            });
+            // Draw center circle
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 20, 0, 2 * Math.PI);
+            ctx.fillStyle = '#333';
+            ctx.fill();
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 3;
+            ctx.stroke();
         }
         
-        function spinWheel() {
+        function rotateWheel() {
+            spinTime += 30;
+            if (spinTime >= spinTimeTotal) {
+                stopRotateWheel();
+                return;
+            }
+            
+            const spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
+            currentAngle += (spinAngle * Math.PI / 180);
+            
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate(currentAngle);
+            ctx.translate(-canvas.width / 2, -canvas.height / 2);
+            drawWheel();
+            ctx.restore();
+        }
+        
+        function stopRotateWheel() {
+            clearTimeout(rotationTimer);
+            
+            const degrees = currentAngle * 180 / Math.PI + 90;
+            const arcd = (360 / segments.length);
+            const index = Math.floor((360 - degrees % 360) / arcd);
+            
+            const finalIndex = index >= segments.length ? 0 : index;
+            
+            result.innerHTML = `🎉 Winner: ${segments[finalIndex]} 🎉`;
+            result.classList.add('show');
+            
+            spinBtn.disabled = false;
+            spinBtn.textContent = 'Spin Again!';
+            isSpinning = false;
+        }
+        
+        function easeOut(t, b, c, d) {
+            const ts = (t /= d) * t;
+            const tc = ts * t;
+            return b + c * (tc + -3 * ts + 3 * t);
+        }
+        
+        let rotationTimer;
+        
+        function spin() {
             if (isSpinning) return;
             
             isSpinning = true;
-            const spinButton = document.getElementById('spinButton');
-            const result = document.getElementById('result');
-            const resultText = document.getElementById('resultText');
-            const wheel = document.getElementById('wheel');
-            
-            // Disable button and hide result
-            spinButton.disabled = true;
-            spinButton.textContent = 'Dreht...';
+            spinBtn.disabled = true;
+            spinBtn.textContent = 'Spinning...';
             result.classList.remove('show');
             
-            // Calculate random spin
-            const minSpins = 3;
-            const maxSpins = 6;
-            const randomSpins = Math.random() * (maxSpins - minSpins) + minSpins;
-            const randomAngle = Math.random() * 360;
+            // Update segments from inputs
+            updateSegments();
             
-            // Each segment is 45 degrees (360/8)
-            const segmentAngle = 360 / 8;
-            const totalRotation = randomSpins * 360 + randomAngle;
-            const finalRotation = currentRotation + totalRotation;
+            spinAngleStart = Math.random() * 10 + 10;
+            spinTime = 0;
+            spinTimeTotal = Math.random() * 3 + 4 * 1000;
             
-            // Apply rotation
-            wheel.style.transform = `rotate(${finalRotation}deg)`;
-            currentRotation = finalRotation % 360;
-            
-            // Calculate winning segment
-            // The pointer is at the top, so we need to account for that
-            const normalizedAngle = (360 - (currentRotation % 360)) % 360;
-            const winningSegmentIndex = Math.floor(normalizedAngle / segmentAngle);
-            const winningSegment = segments[winningSegmentIndex];
-            
-            // Show result after animation
-            setTimeout(() => {
-                resultText.textContent = `🎉 ${winningSegment} 🎉`;
-                result.classList.add('show');
-                
-                // Re-enable button
-                spinButton.disabled = false;
-                spinButton.textContent = 'Nochmal drehen!';
-                isSpinning = false;
-            }, 3000);
+            rotationTimer = setInterval(rotateWheel, 30);
         }
         
-        // Initialize with default options
-        updateOptions();
+        function updateSegments() {
+            for (let i = 0; i < 8; i++) {
+                const input = document.getElementById(`option${i}`);
+                if (input && input.value.trim()) {
+                    segments[i] = input.value.trim();
+                }
+            }
+        }
         
-        // Add keyboard support
+        function resetWheel() {
+            if (isSpinning) return;
+            
+            currentAngle = 0;
+            result.classList.remove('show');
+            spinBtn.textContent = 'Spin the Wheel!';
+            drawWheel();
+        }
+        
+        // Initialize wheel
+        drawWheel();
+        
+        // Add event listeners for input changes
+        for (let i = 0; i < 8; i++) {
+            document.getElementById(`option${i}`).addEventListener('input', function() {
+                if (!isSpinning) {
+                    updateSegments();
+                    drawWheel();
+                }
+            });
+        }
+        
+        // Keyboard support
         document.addEventListener('keydown', function(event) {
             if (event.code === 'Space' && !isSpinning) {
                 event.preventDefault();
-                spinWheel();
+                spin();
             }
-        });
-        
-        // Add enter key support for inputs
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('keypress', function(event) {
-                if (event.key === 'Enter') {
-                    updateOptions();
-                }
-            });
         });
     </script>
 </body>
